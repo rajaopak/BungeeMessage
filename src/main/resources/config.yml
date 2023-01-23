@@ -1,0 +1,4 @@
+report-cooldown: 300 #seconds
+message-expire: 120 #seconds
+message-format-from: "&dFrom &8[&a{server}&8] &b{from}&7: {msg}"
+message-format-to: "&dTo &8[&a{server}&8] &b{to}&7: {msg}"

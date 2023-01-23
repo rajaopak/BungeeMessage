@@ -1,0 +1,6 @@
+name: BungeeMessage
+version: '${version}'
+author: rajaopak
+main: id.rajaopak.bungeemessage.BungeeMessage
+description: Bungeecord messaging plugin
+softDepends: [ PremiumVanish ]
