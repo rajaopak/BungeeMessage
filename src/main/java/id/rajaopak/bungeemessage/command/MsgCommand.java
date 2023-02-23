@@ -45,7 +45,7 @@ public class MsgCommand extends Command implements TabExecutor {
         }
 
         if (this.plugin.getProxy().getPluginManager().getPlugin("PremiumVanish") != null) {
-            if (BungeeVanishAPI.isInvisible(this.plugin.getProxy().getPlayer(args[0]))) {
+            if (BungeeVanishAPI.isInvisible(this.plugin.getProxy().getPlayer(args[0])) && !sender.hasPermission("dosmessage.msg.staff")) {
                 sender.sendMessage(Common.color("&cPlayer not found."));
                 return;
             }
@@ -71,7 +71,7 @@ public class MsgCommand extends Command implements TabExecutor {
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
 
         if (args.length == 1) {
-            return this.plugin.getProxy().getPlayers().stream().map(ProxiedPlayer::getDisplayName).collect(Collectors.toList());
+            return this.plugin.getProxy().getPlayers().stream().map(ProxiedPlayer::getDisplayName).sorted().collect(Collectors.toList());
         }
 
         return Collections.emptyList();

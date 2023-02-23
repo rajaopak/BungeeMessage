@@ -10,6 +10,7 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class ReportAdminCommand extends Command implements TabExecutor {
@@ -151,7 +152,7 @@ public class ReportAdminCommand extends Command implements TabExecutor {
                 }
             } else if (args[0].equalsIgnoreCase("get")) {
                 if (args.length == 2) {
-                    return this.plugin.getProxy().getPlayers().stream().map(ProxiedPlayer::getDisplayName).toList();
+                    return this.plugin.getProxy().getPlayers().stream().map(ProxiedPlayer::getDisplayName).sorted().collect(Collectors.toList());
                 } else if (args.length == 3) {
                     List<HelpMeData> data = this.plugin.getReportManager().getMessage(args[1]);
                     int finalPage = data.size() / 5;

@@ -9,6 +9,7 @@ import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 public class ReportCommand extends Command implements TabExecutor {
 
@@ -70,6 +71,6 @@ public class ReportCommand extends Command implements TabExecutor {
 
     @Override
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
-        return this.plugin.getProxy().getPlayers().stream().map(ProxiedPlayer::getDisplayName).toList();
+        return this.plugin.getProxy().getPlayers().stream().map(ProxiedPlayer::getDisplayName).sorted().collect(Collectors.toList());
     }
 }
