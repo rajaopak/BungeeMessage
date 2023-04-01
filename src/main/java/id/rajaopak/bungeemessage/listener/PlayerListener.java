@@ -19,8 +19,6 @@ public class PlayerListener implements Listener {
         ProxiedPlayer p = e.getPlayer();
 
         this.plugin.getReportManager().removeData(p.getName());
-        this.plugin.getMessageManager().removeSocialSpy(p);
-        this.plugin.getMessageManager().toggleMessage(p);
     }
 
 }
