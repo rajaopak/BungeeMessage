@@ -127,6 +127,8 @@ public class ReportAdminCommand extends Command implements TabExecutor {
                     sender.sendMessage(Common.color("&cUnknown history page"));
                 }
             }
+        } else {
+            sender.sendMessage(Common.color("&cUsage: /reportadmin (history|get)"));
         }
     }
 
