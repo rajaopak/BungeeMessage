@@ -152,7 +152,10 @@ public class ReportAdminCommand extends Command implements TabExecutor {
                 }
             } else if (args[0].equalsIgnoreCase("get")) {
                 if (args.length == 2) {
-                    return this.plugin.getProxy().getPlayers().stream().map(ProxiedPlayer::getDisplayName).sorted().collect(Collectors.toList());
+                    return this.plugin.getProxy().getPlayers().stream()
+                            .map(ProxiedPlayer::getDisplayName)
+                            .filter(s -> s.toLowerCase().startsWith(args[0]))
+                            .sorted().collect(Collectors.toList());
                 } else if (args.length == 3) {
                     List<HelpMeData> data = this.plugin.getReportManager().getMessage(args[1]);
                     int finalPage = data.size() / 5;

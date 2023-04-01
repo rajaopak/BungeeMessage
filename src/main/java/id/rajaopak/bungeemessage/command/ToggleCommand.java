@@ -59,7 +59,10 @@ public class ToggleCommand extends Command implements TabExecutor {
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
 
         if (args.length == 1) {
-            return this.plugin.getProxy().getPlayers().stream().map(ProxiedPlayer::getDisplayName).sorted().collect(Collectors.toList());
+            return this.plugin.getProxy().getPlayers().stream()
+                    .map(ProxiedPlayer::getDisplayName)
+                    .filter(s -> s.toLowerCase().startsWith(args[0]))
+                    .sorted().collect(Collectors.toList());
         }
 
         return Collections.emptyList();

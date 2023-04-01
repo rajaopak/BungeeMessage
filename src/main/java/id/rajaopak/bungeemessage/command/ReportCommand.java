@@ -71,6 +71,9 @@ public class ReportCommand extends Command implements TabExecutor {
 
     @Override
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
-        return this.plugin.getProxy().getPlayers().stream().map(ProxiedPlayer::getDisplayName).sorted().collect(Collectors.toList());
+        return this.plugin.getProxy().getPlayers().stream()
+                .map(ProxiedPlayer::getDisplayName)
+                .filter(s -> s.toLowerCase().startsWith(args[0]))
+                .sorted().collect(Collectors.toList());
     }
 }

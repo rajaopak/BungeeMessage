@@ -48,7 +48,3 @@ processResources {
         expand props
     }
 }
-
-jar {
-    destinationDir file("D:\\server\\bungeecord\\plugins")
-}
