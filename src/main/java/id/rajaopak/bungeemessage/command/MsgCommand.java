@@ -70,11 +70,25 @@ public class MsgCommand extends Command implements TabExecutor {
     @Override
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
 
-        if (args.length == 1) {
+        if (args.length == 1 || args.length == 2) {
             return this.plugin.getProxy().getPlayers().stream()
+                    .map(proxiedPlayer -> {
+                        if (this.plugin.getProxy().getPluginManager().getPlugin("PremiumVanish") != null) {
+                            if (!BungeeVanishAPI.isInvisible(proxiedPlayer)) {
+                                return proxiedPlayer;
+                            }
+                        }
+                        return proxiedPlayer;
+                    })
                     .map(ProxiedPlayer::getDisplayName)
-                    .filter(s -> s.toLowerCase().startsWith(args[0]))
-                    .sorted().collect(Collectors.toList());
+                    .filter(s -> {
+                        if (args.length == 2) {
+                            return s.toLowerCase().startsWith(args[0]);
+                        }
+
+                        return true;
+                    })
+                    .sorted(String::compareToIgnoreCase).collect(Collectors.toList());
         }
 
         return Collections.emptyList();

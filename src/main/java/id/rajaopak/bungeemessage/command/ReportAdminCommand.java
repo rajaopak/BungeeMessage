@@ -74,9 +74,7 @@ public class ReportAdminCommand extends Command implements TabExecutor {
                 } else {
                     sender.sendMessage(Common.color("&cUnknown history page"));
                 }
-            }
-
-            if (args[0].equalsIgnoreCase("get")) {
+            } else if (args[0].equalsIgnoreCase("get")) {
                 if (args.length > 3) {
                     sender.sendMessage(Common.color("&cUsage: /" + getName() + " <Player> [page]"));
                     return;
@@ -126,6 +124,8 @@ public class ReportAdminCommand extends Command implements TabExecutor {
                 } else {
                     sender.sendMessage(Common.color("&cUnknown history page"));
                 }
+            } else {
+                sender.sendMessage(Common.color("&cUsage: /reportadmin (history|get)"));
             }
         } else {
             sender.sendMessage(Common.color("&cUsage: /reportadmin (history|get)"));

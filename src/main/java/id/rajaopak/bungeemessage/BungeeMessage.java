@@ -3,14 +3,12 @@ package id.rajaopak.bungeemessage;
 import id.rajaopak.bungeemessage.command.*;
 import id.rajaopak.bungeemessage.file.HistoryFile;
 import id.rajaopak.bungeemessage.listener.PlayerListener;
-import id.rajaopak.bungeemessage.manager.ConfigManager;
-import id.rajaopak.bungeemessage.manager.CooldownManager;
-import id.rajaopak.bungeemessage.manager.MessageManager;
-import id.rajaopak.bungeemessage.manager.ReportManager;
+import id.rajaopak.bungeemessage.manager.*;
 import net.md_5.bungee.api.plugin.Plugin;
 
 public final class BungeeMessage extends Plugin {
 
+    private MessageHistoryManager messageHistoryManager;
     private CooldownManager cooldownManager;
     private MessageManager messageManager;
     private ReportManager reportManager;
@@ -20,12 +18,14 @@ public final class BungeeMessage extends Plugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
+        this.messageHistoryManager = new MessageHistoryManager(this);
         this.cooldownManager = new CooldownManager(this);
         this.messageManager = new MessageManager(this);
         this.reportManager = new ReportManager(this);
         this.configManager = new ConfigManager(this);
         this.historyFile = new HistoryFile(this);
 
+        this.getProxy().getPluginManager().registerCommand(this, new MessageHistoryCommand(this));
         this.getProxy().getPluginManager().registerCommand(this, new MsgCommand(this));
         this.getProxy().getPluginManager().registerCommand(this, new ReplyCommand(this));
         this.getProxy().getPluginManager().registerCommand(this, new SocialSpyCommand(this));
@@ -70,5 +70,9 @@ public final class BungeeMessage extends Plugin {
 
     public CooldownManager getCooldownManager() {
         return cooldownManager;
+    }
+
+    public MessageHistoryManager getMessageHistoryManager() {
+        return messageHistoryManager;
     }
 }

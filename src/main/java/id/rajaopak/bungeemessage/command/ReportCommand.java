@@ -1,5 +1,6 @@
 package id.rajaopak.bungeemessage.command;
 
+import de.myzelyam.api.vanish.BungeeVanishAPI;
 import id.rajaopak.bungeemessage.BungeeMessage;
 import id.rajaopak.bungeemessage.data.HelpMeData;
 import id.rajaopak.bungeemessage.util.Common;
@@ -72,8 +73,22 @@ public class ReportCommand extends Command implements TabExecutor {
     @Override
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
         return this.plugin.getProxy().getPlayers().stream()
+                .map(proxiedPlayer -> {
+                    if (this.plugin.getProxy().getPluginManager().getPlugin("PremiumVanish") != null) {
+                        if (!BungeeVanishAPI.isInvisible(proxiedPlayer)) {
+                            return proxiedPlayer;
+                        }
+                    }
+                    return proxiedPlayer;
+                })
                 .map(ProxiedPlayer::getDisplayName)
-                .filter(s -> s.toLowerCase().startsWith(args[0]))
-                .sorted().collect(Collectors.toList());
+                .filter(s -> {
+                    if (args.length == 2) {
+                        return s.toLowerCase().startsWith(args[0]);
+                    }
+
+                    return true;
+                })
+                .sorted(String::compareToIgnoreCase).collect(Collectors.toList());
     }
 }

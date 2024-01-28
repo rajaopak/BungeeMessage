@@ -11,10 +11,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class MessageManager {
 
@@ -36,7 +33,7 @@ public class MessageManager {
     }
 
     public void sendMessage(CommandSender from, String to, String message) {
-        CommandSender t = (CommandSender) ProxyServer.getInstance().getPlayer(to);
+        CommandSender target = ProxyServer.getInstance().getPlayer(to);
 
         if (togglePlayer.contains(this.plugin.getProxy().getPlayer(to))) {
             from.sendMessage(Common.color("&cYou can't message this player!"));
@@ -44,58 +41,81 @@ public class MessageManager {
         }
 
         HashMap<CommandSender, Long> inner;
-        if (this.messages.containsKey(t)) {
-            inner = this.messages.get(t);
+        if (this.messages.containsKey(target)) {
+            inner = this.messages.get(target);
         } else {
             inner = new HashMap<>();
         }
 
+        inner.remove(from);
         inner.put(from, System.currentTimeMillis() + (plugin.getConfigManager().getConfiguration().getLong("message-expire") * 1000L));
-        this.messages.put(t, inner);
+        if (this.messages.containsKey(target))
+            this.messages.replace(target, inner);
+        else
+            this.messages.put(target, inner);
 
-        formatMessage(from, message, t);
+        formatMessage(from, message, target);
     }
 
     public void replyMessage(CommandSender from, String message) {
         if (this.messages.containsKey(from)) {
             HashMap<CommandSender, Long> sender = this.messages.get(from);
+            // get the latest sender who messaged this player
+            CommandSender target = sender.keySet().stream().max(Comparator.comparing(sender::get)).orElse(null);
 
-            this.messages.get(from).keySet().stream().findFirst().ifPresentOrElse(to -> {
+            // check if target exists
+            if (target == null) {
+                from.sendMessage(Common.color("&cYou have nobody to whom you can reply."));
+                return;
+            }
 
-                if (sender.get(to) > System.currentTimeMillis()) {
-                    if (this.plugin.getProxy().getPluginManager().getPlugin("PremiumVanish") != null) {
-                        if (BungeeVanishAPI.isInvisible(this.plugin.getProxy().getPlayer(to.getName())) && !from.hasPermission("dosmessage.msg.staff")) {
-                            from.sendMessage(Common.color("&cPlayer not found."));
-                            return;
-                        }
-                    }
+            // check if cooldown has expired
+            if (System.currentTimeMillis() < sender.get(target)) {
+                sender.remove(target); // remove expired entry
+                this.messages.replace(from, sender); // update map
+                from.sendMessage(Common.color("&cYou have nobody to whom you can reply."));
+                return;
+            }
 
-                    if (togglePlayer.contains(this.plugin.getProxy().getPlayer(to.getName()))) {
-                        from.sendMessage(Common.color("&cYou can't message this player!"));
+            if (this.plugin.getProxy().getPluginManager().getPlugin("PremiumVanish") != null) {
+                if (target instanceof ProxiedPlayer) {
+                    if (BungeeVanishAPI.isInvisible((ProxiedPlayer) target) && !from.hasPermission("dosmessage.msg.staff")) {
+                        from.sendMessage(Common.color("&cPlayer not found."));
                         return;
                     }
-
-                    HashMap<CommandSender, Long> receiver;
-
-                    if (this.messages.containsKey(to)) {
-                        receiver = this.messages.get(to);
-                    } else {
-                        receiver = new HashMap<>();
-                    }
-
-                    formatMessage(from, message, to);
-
-                    receiver.put(from, System.currentTimeMillis() + (plugin.getConfigManager().getConfiguration().getLong("message-expire") * 1000L));
-                    this.messages.put(to, receiver);
-
-                    sender.put(to, System.currentTimeMillis() + (plugin.getConfigManager().getConfiguration().getLong("message-expire") * 1000L));
-                    this.messages.put(from, sender);
-                } else {
-                    sender.remove(to);
-                    this.messages.remove(from, sender);
-                    from.sendMessage(Common.color("&cYou have nobody to whom you can reply."));
                 }
-            }, () -> from.sendMessage(Common.color("&cYou have nobody to whom you can reply.")));
+            }
+
+            if (target instanceof ProxiedPlayer) {
+                if (togglePlayer.contains(target)) {
+                    from.sendMessage(Common.color("&cYou can't message this player!"));
+                    return;
+                }
+            }
+
+            HashMap<CommandSender, Long> receiver;
+
+            if (this.messages.containsKey(target)) {
+                receiver = this.messages.get(target);
+            } else {
+                receiver = new HashMap<>();
+            }
+
+            formatMessage(from, message, target);
+
+            receiver.remove(from); // To make sure the player doesn't have double or more entries
+            receiver.put(from, System.currentTimeMillis() + (plugin.getConfigManager().getConfiguration().getLong("message-expire") * 1000L));
+            if (this.messages.containsKey(target))
+                this.messages.replace(target, receiver);
+            else
+                this.messages.put(target, receiver);
+
+            sender.remove(target); // To make sure the player doesn't have double or more entries
+            sender.put(target, System.currentTimeMillis() + (plugin.getConfigManager().getConfiguration().getLong("message-expire") * 1000L));
+            if (this.messages.containsKey(from))
+                this.messages.replace(from, sender);
+            else
+                this.messages.put(from, sender);
         } else {
             from.sendMessage(Common.color("&cYou have nobody to whom you can reply."));
         }
@@ -153,17 +173,8 @@ public class MessageManager {
         }
     }
 
-    public void removeSocialSpy(ProxiedPlayer player) {
-        if (!player.hasPermission("dosmessage.socialspy")) {
-            return;
-        }
-
-        this.spyPlayer.remove(player);
-    }
-
     public void clearCache() {
         this.messages.clear();
         this.spyPlayer.clear();
     }
-
 }
