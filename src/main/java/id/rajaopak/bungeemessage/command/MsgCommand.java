@@ -1,6 +1,7 @@
 package id.rajaopak.bungeemessage.command;
 
 import de.myzelyam.api.vanish.BungeeVanishAPI;
+import de.myzelyam.api.vanish.VanishAPI;
 import id.rajaopak.bungeemessage.BungeeMessage;
 import id.rajaopak.bungeemessage.util.Common;
 import net.md_5.bungee.api.CommandSender;
@@ -10,6 +11,7 @@ import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class MsgCommand extends Command implements TabExecutor {
@@ -76,11 +78,14 @@ public class MsgCommand extends Command implements TabExecutor {
                         if (this.plugin.getProxy().getPluginManager().getPlugin("PremiumVanish") != null) {
                             if (!BungeeVanishAPI.isInvisible(proxiedPlayer)) {
                                 return proxiedPlayer;
+                            } else {
+                                return null;
                             }
                         }
                         return proxiedPlayer;
                     })
-                    .map(ProxiedPlayer::getDisplayName)
+                    .filter(Objects::nonNull)
+                    .map(ProxiedPlayer::getName)
                     .filter(s -> {
                         if (args.length == 2) {
                             return s.toLowerCase().startsWith(args[0]);

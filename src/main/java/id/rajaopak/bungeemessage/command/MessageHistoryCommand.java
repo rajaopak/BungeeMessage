@@ -43,12 +43,10 @@ public class MessageHistoryCommand extends Command implements TabExecutor {
             return;
         }
 
-        int page;
+        int page = 1;
         try {
             page = Integer.parseInt(args[1]);
-        } catch (NumberFormatException e) {
-            sender.sendMessage(Common.color("&cPage must be a number!"));
-            return;
+        } catch (NumberFormatException ignored) {
         }
 
         plugin.getMessageHistoryManager().sendHistory((ProxiedPlayer) sender, target, page);
@@ -56,7 +54,10 @@ public class MessageHistoryCommand extends Command implements TabExecutor {
 
     @Override
     public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
-        if (args.length != 1) return this.plugin.getProxy().getPlayers().stream().map(CommandSender::getName).sorted().collect(Collectors.toList());
+        if (args.length == 1) return this.plugin.getProxy().getPlayers().stream()
+                .map(CommandSender::getName)
+                .filter(s -> s.startsWith(args[0]))
+                .sorted().collect(Collectors.toList());
         return Collections.emptyList();
     }
 }

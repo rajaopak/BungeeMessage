@@ -10,6 +10,7 @@ import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class ReportCommand extends Command implements TabExecutor {
@@ -77,11 +78,14 @@ public class ReportCommand extends Command implements TabExecutor {
                     if (this.plugin.getProxy().getPluginManager().getPlugin("PremiumVanish") != null) {
                         if (!BungeeVanishAPI.isInvisible(proxiedPlayer)) {
                             return proxiedPlayer;
+                        } else {
+                            return null;
                         }
                     }
                     return proxiedPlayer;
                 })
-                .map(ProxiedPlayer::getDisplayName)
+                .filter(Objects::nonNull)
+                .map(ProxiedPlayer::getName)
                 .filter(s -> {
                     if (args.length == 2) {
                         return s.toLowerCase().startsWith(args[0]);
